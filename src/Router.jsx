@@ -1,9 +1,9 @@
-import { Routes, Route } from "react-router-dom";
+import "./style.css";
 import { CssBaseline } from "@mui/material";
 import { CheckAuth } from "./auth/checkAuth";
 import { LoginKeeper } from "./auth/loginKeeper";
-import { Home, Login, Books, NotFound } from "./pages";
-import "./style.css";
+import { Routes, Route } from "react-router-dom";
+import { Home, Login, Books, AddBook, NotFound } from "./pages";
 
 export const Router = () => {
   return (
@@ -16,6 +16,7 @@ export const Router = () => {
         <Route element={<CheckAuth />}>
           <Route path="home" element={<Home />} />
           <Route path="books" element={<Books />} />
+          <Route path="add-book" element={<AddBook />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -1,6 +1,6 @@
 import { Grid, Box, Container, Typography } from "@mui/material";
+import { Sidebar } from "../../components/sidebar/Sidebar";
 import chartOptions from "./data/chartOptions.json";
-import { Sidebar } from "../../components/Sidebar";
 import chartData from "./data/chartData.json";
 import { Line } from "react-chartjs-2";
 
