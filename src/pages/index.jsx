@@ -6,3 +6,4 @@ export { Books } from "./books/Books";
 export { Login } from "./login/Login";
 export { AddBook } from "./books/AddBook";
 export { NotFound } from "./404/NotFound";
+export { EditBook } from "./books/EditBook";
