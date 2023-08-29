@@ -5,10 +5,13 @@ export const ReadMore = ({ children }) => {
   const [isReadMore, setIsReadMore] = useState(true);
 
   return (
-    <Typography className="text">
-      {isReadMore ? children.slice(0, 100) : children}
-      <span onClick={() => setIsReadMore(!isReadMore)}>
-        <b>{isReadMore ? "...read more" : " show less"}</b>
+    <Typography>
+      {isReadMore ? children.slice(0, 75) : children}
+      <span
+        style={{ color: "blue" }}
+        onClick={() => setIsReadMore(!isReadMore)}
+      >
+        {isReadMore ? " ...read more" : " show less"}
       </span>
     </Typography>
   );

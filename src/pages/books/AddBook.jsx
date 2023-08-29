@@ -1,11 +1,17 @@
-import { Link } from "react-router-dom";
 import { useState, useRef } from "react";
+import { ReadMore } from "../../widget/ReadMore";
+import { Link, useNavigate } from "react-router-dom";
 import { Add, Visibility } from "@mui/icons-material";
+import { uploadImage, addDocument } from "../../firebase";
 import { Sidebar } from "../../components/sidebar/Sidebar";
 import {
   Box,
   Grid,
+  Alert,
   Button,
+  Drawer,
+  Divider,
+  Snackbar,
   TextField,
   IconButton,
   Typography,
@@ -13,14 +19,50 @@ import {
 
 export const AddBook = () => {
   const uploadBtn = useRef(null);
+  const navigate = useNavigate();
 
   const [author, setAuthor] = useState("");
   const [chapter, setChapter] = useState("");
   const [summary, setSummary] = useState("");
   const [content, setContent] = useState([]);
   const [bookName, setBookName] = useState("");
+  const [successMsg, setSuccessMsg] = useState(false);
+  const [rightDrawer, setRightDrawer] = useState(false);
+  const [previewImg, setPreviewImg] = useState("/upload-image.png");
 
-  const handleSubmit = () => {};
+  const handleAddChapter = () => {
+    setContent([...content, { chapter, summary }]);
+
+    setChapter("");
+    setSummary("");
+    setRightDrawer(!rightDrawer);
+  };
+
+  const imgUpload = (e) => {
+    const imgFile = e.target.files[0];
+
+    setPreviewImg(URL.createObjectURL(imgFile));
+    uploadImage(imgFile).then((res) => setPreviewImg(res));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const data = {
+      author,
+      content,
+      bookName,
+      previewImg,
+    };
+
+    addDocument("books", data).then(() => {
+      setSuccessMsg(!successMsg);
+
+      setTimeout(() => {
+        navigate("/books");
+      }, 2500);
+    });
+  };
 
   return (
     <Sidebar>
@@ -32,9 +74,15 @@ export const AddBook = () => {
                 sx={{ cursor: "pointer" }}
                 onClick={() => uploadBtn.current.click()}
               >
-                <img src="/upload-image.png" alt="Upload Image" />
+                <img src={previewImg} alt="Uploaded Image" />
               </Box>
-              <input ref={uploadBtn} type="file" accept="image/*" hidden />
+              <input
+                type="file"
+                ref={uploadBtn}
+                accept="image/*"
+                onChange={imgUpload}
+                hidden
+              />
             </Grid>
             <Grid item md={6}>
               <TextField
@@ -63,11 +111,11 @@ export const AddBook = () => {
                 >
                   <Typography>Add Book Content</Typography>
                   <Box>
-                    <IconButton onClick={() => {}}>
+                    <IconButton onClick={() => setRightDrawer(!rightDrawer)}>
                       <Visibility />
                     </IconButton>
                     &nbsp; &nbsp; &nbsp;
-                    <IconButton onClick={() => {}}>
+                    <IconButton onClick={handleAddChapter}>
                       <Add />
                     </IconButton>
                   </Box>
@@ -76,9 +124,8 @@ export const AddBook = () => {
                 <TextField
                   value={chapter}
                   label="Chapter Name"
-                  onChange={(e) => setAuthor(e.target.value)}
+                  onChange={(e) => setChapter(e.target.value)}
                   fullWidth
-                  required
                 />
                 <br />
                 <br />
@@ -86,10 +133,9 @@ export const AddBook = () => {
                   rows={3}
                   value={summary}
                   label="Summary"
-                  onChange={(e) => setAuthor(e.target.value)}
+                  onChange={(e) => setSummary(e.target.value)}
                   fullWidth
                   multiline
-                  required
                 />
               </Box>
             </Grid>
@@ -107,6 +153,46 @@ export const AddBook = () => {
           </Box>
         </form>
       </Box>
+
+      {/* Books Preview */}
+      <Drawer
+        anchor="right"
+        open={rightDrawer}
+        onClose={() => setRightDrawer(!rightDrawer)}
+      >
+        <Box width={300}>
+          <br />
+          <Typography textAlign="center">Chapter Previews</Typography>
+          <br />
+          <Divider />
+          <br />
+          {content &&
+            content.map((e, index) => {
+              return (
+                <Box key={index} p={2} width={300}>
+                  <Typography>
+                    <b>{e.chapter}</b>
+                  </Typography>
+                  <br />
+                  <ReadMore>{e.summary.trim()}</ReadMore>
+                  <br />
+                  <Divider />
+                  <br />
+                </Box>
+              );
+            })}
+        </Box>
+      </Drawer>
+
+      <Snackbar
+        open={successMsg}
+        autoHideDuration={2500}
+        onClose={() => setSuccessMsg(!successMsg)}
+      >
+        <Alert severity="success" sx={{ width: "100%" }}>
+          Data Added Successfully
+        </Alert>
+      </Snackbar>
     </Sidebar>
   );
 };
